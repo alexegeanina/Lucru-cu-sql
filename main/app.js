@@ -4,8 +4,8 @@ const Sequelize = require('sequelize')
 
 const mysql = require('mysql2/promise')
 
-const DB_USERNAME = 'root'
-const DB_PASSWORD = 'welcome12#'
+const DB_USERNAME = 'geanina'
+const DB_PASSWORD = 'password'
 
 let conn
 
@@ -51,7 +51,11 @@ app.get('/create', async (req, res) => {
                 age : 30 + i
             })
             await student.save()
+          
+            
         }
+       
+     
         res.status(201).json({message : 'created'})
     }
     catch(err){
@@ -63,6 +67,7 @@ app.get('/create', async (req, res) => {
 app.get('/students', async (req, res) => {
     try{
         let students = await Student.findAll()
+       
         res.status(200).json(students)
     }
     catch(err){
@@ -73,12 +78,38 @@ app.get('/students', async (req, res) => {
 
 app.post('/students', async (req, res) => {
     try{
-        // TODO
+       if((req.body.name==undefined)&&(req.body.address==undefined)&&(req.body.name==undefined)){
+         res.status(400).json({"message": "body is missing"})
+          
+      }
+        
+    else if(req.body.name==null){
+             res.status(400).json({"message": "malformed request"})
+           
+    }else if(req.body.address==null){
+            res.status(400).json({"message": "malformed request"})
+      }else if(req.body.age==isNaN()){
+          res.status(400).json({"message": "malformed request"})
+   }
+      else if(req.body.age<0){
+       res.status(400).json({"message": "age should be a positive number"})
+       }
+       else{
+      
+     let student= new Student(req.body)
+        
+   student.save()
+
+        res.status(201).json({"message": "created"})
+    }
+    
     }
     catch(err){
         console.warn(err.stack)
         res.status(500).json({message : 'server error'})        
     }
+    
+ 
 })
 
 module.exports = app
